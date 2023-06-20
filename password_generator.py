@@ -2,6 +2,7 @@ import string
 import random
 import pyperclip
 import argparse
+import zxcvbn
 
 def generate_password(length=12, include_letters=True, include_digits=True, include_symbols=True):
     characters = ''
@@ -14,6 +15,10 @@ def generate_password(length=12, include_letters=True, include_digits=True, incl
 
     password = ''.join(random.choice(characters) for _ in range(length))
     return password
+
+def evaluate_password_strength(password):
+    result = zxcvbn.zxcvbn(password)
+    return result
 
 def copy_to_clipboard(text):
     pyperclip.copy(text)
@@ -34,5 +39,12 @@ if __name__ == '__main__':
         include_symbols=args.symbols
     )
 
+    password_strength = evaluate_password_strength(password)
+    score = password_strength['score']
+    feedback = password_strength['feedback']
+
     copy_to_clipboard(password)
     print('Generated password:', password)
+    print('Password Strength Score:', score)
+    print('Feedback:', feedback)
+
