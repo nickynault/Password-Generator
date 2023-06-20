@@ -11,7 +11,7 @@ A simple command-line tool for generating random passwords.
 ## Getting Started
 
 1. Clone the repository:
-   git clone <repository_url>
+   git clone [<repository_url>](https://github.com/nickynault/Password-Generator.git)
    
 2. Navigate to the project directory:
   cd password-generator
