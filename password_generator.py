@@ -3,6 +3,7 @@ import random
 import pyperclip
 import argparse
 import os
+import csv
 import zxcvbn
 from datetime import datetime, timedelta
 

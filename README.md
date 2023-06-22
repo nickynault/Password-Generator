@@ -26,7 +26,7 @@ A simple command-line tool for generating random passwords.
     source venv/bin/activate
    
 5. Install the required packages:
-  pip install pyperclip
+  pip install pyperclip zxcvbn
 
 
 ## Usage
@@ -38,9 +38,34 @@ The generated password will be printed, and it will be automatically copied to y
 
 ## Customization
 
-You can customize the length of the generated password by modifying the length parameter in the generate_password() function.
-If you wish to exclude certain character types from the generated password, you can modify the characters variable in the generate_password() function.
+You can customize the length and character types of the generated password by using the command-line options:
+  python password_generator.py -l <length> -lt -d -s
 
+Options:
+
+-l or --length: Specifies the length of the password (default: 12).
+-lt or --letters: Include letters (both uppercase and lowercase) in the password.
+-d or --digits: Include digits in the password.
+-s or --symbols: Include symbols in the password.
+
+Examples:
+
+Generate a 10-character password with letters and digits:
+  python password_generator.py -l 10 -lt -d
+
+Generate a password with symbols only:
+  python password_generator.py -lt -s
+
+
+## Password History and Expiration
+
+The tool keeps a password history and allows you to check for expired passwords. Passwords are stored in a file named password_history.txt.
+
+To check for expired passwords, run the following command:
+  python password_generator.py -E
+
+To view the password history, run the following command:
+  python password_generator.py -H
 
 ## License
 This project is licensed under the MIT License.
