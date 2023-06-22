@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 
 import string
 import random
@@ -34,18 +34,38 @@ def evaluate_password_strength(password):
     return score, feedback
 
 
-
 def copy_to_clipboard(text):
     pyperclip.copy(text)
 
 def save_password_to_history(password):
     expiration_date = datetime.now() + timedelta(days=EXPIRATION_DAYS)
-    with open(HISTORY_FILE, 'a') as file:
-        file.write(f"{password},{expiration_date.strftime('%Y-%m-%d')}\n")
+    with open(HISTORY_FILE, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([password, expiration_date.strftime('%Y-%m-%d')])
+
+# Function to handle the Save button click event
+def save_password_handler():
+    password = password_label['text'][19:]  # Extract the generated password from the label text
+
+    filename = filedialog.asksaveasfilename(
+        defaultextension=".csv",
+        filetypes=[("CSV Files", "*.csv"), ("Text Files", "*.txt")],
+        title="Save Password"
+    )
+
+    if filename:
+        save_password_to_history(password)
+        with open(filename, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([password, datetime.now().strftime('%Y-%m-%d')])
+        messagebox.showinfo("Password Saved", f"Password saved to file:\n{filename}")
+    else:
+        messagebox.showwarning("No File Selected", "No file selected. Password saved in default location (password_history.txt).")
 
 # Function to fade the "Copied to clipboard" label
 def fade_copied_label():
     copied_label.config(text="")
+    copied_label.after(3000, lambda: copied_label.config(fg="white"))
 
 # Create the main window
 window = tk.Tk()
@@ -79,6 +99,7 @@ def generate_password_handler():
     )
 
     password_label.config(text="Generated Password: " + password)
+    save_button.config(state="normal")
 
     # Evaluate password strength
     score, feedback = evaluate_password_strength(password)
@@ -132,8 +153,12 @@ feedback_label = tk.Label(window, text="Feedback:", font=("Arial", 18))
 feedback_label.pack()
 
 # Label to display "Copied to clipboard" message
-copied_label = tk.Label(window, text="", font=("Arial", 12))
+copied_label = tk.Label(window, text="", font=("Arial", 12), fg="green")
 copied_label.pack(pady=10)
+
+# Button to save password
+save_button = tk.Button(window, text="Save", command=save_password_handler, font=("Ariel", 18), state="disabled")
+save_button.pack(pady=(10, 20))
 
 # Schedule the fading effect
 window.after(3000, fade_copied_label)
