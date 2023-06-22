@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 HISTORY_FILE = 'password_history.txt'
 EXPIRATION_DAYS = 90
 
+# Generates a random password with customizable options
 def generate_password(length=12, include_letters=True, include_digits=True, include_symbols=True):
     characters = ''
     if include_letters:
@@ -21,18 +22,22 @@ def generate_password(length=12, include_letters=True, include_digits=True, incl
     password = ''.join(random.choice(characters) for _ in range(length))
     return password
 
+# Evaluates the strength of a password using zxcvbn library
 def evaluate_password_strength(password):
     result = zxcvbn.zxcvbn(password)
     return result
 
+# Copies the given text to the clipboard
 def copy_to_clipboard(text):
     pyperclip.copy(text)
 
+# Saves the password and its expiration date to the password history file
 def save_password_to_history(password):
     expiration_date = datetime.now() + timedelta(days=EXPIRATION_DAYS)
     with open(HISTORY_FILE, 'a') as file:
         file.write(f"{password},{expiration_date.strftime('%Y-%m-%d')}\n")
 
+# Loads the password history from the file
 def load_password_history():
     if not os.path.isfile(HISTORY_FILE):
         return []
@@ -40,6 +45,7 @@ def load_password_history():
         password_history = file.read().splitlines()
     return password_history
 
+# Checks for expired passwords in the password history
 def check_password_expiration():
     password_history = load_password_history()
     if not password_history:
@@ -78,8 +84,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # Check password expiration if the corresponding flag is provided
     if args.expiration:
         check_password_expiration()
+    # Display password history if the corresponding flag is provided
     elif args.history:
         password_history = load_password_history()
         if password_history:
@@ -89,7 +97,9 @@ if __name__ == '__main__':
                 print(f"Password: {password} (Expires on: {expiration_date})")
         else:
             print('No password history found.')
+    # Generate and handle passwords
     else:
+        # Set default options if no specific options are provided
         if not args.letters and not args.digits and not args.symbols:
             args.letters = True
             args.digits = True
@@ -106,15 +116,18 @@ if __name__ == '__main__':
             passwords.append([password])
             save_password_to_history(password)
 
+        # Evaluate the strength of the first password generated
         password_strength = evaluate_password_strength(passwords[0][0])
         score = password_strength['score']
         feedback = password_strength['feedback']
 
+        # Save passwords to a file if the filename is provided
         if args.filename:
             with open(args.filename, 'a', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows(passwords)
 
+        # Copy the first password to the clipboard
         copy_to_clipboard(passwords[0][0])
         print(f'Generated {args.count} passwords:')
         for password in passwords:
