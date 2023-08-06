@@ -1,17 +1,16 @@
+import csv
+import random
+import string
 import tkinter as tk
+from datetime import datetime, timedelta
 from tkinter import messagebox, filedialog
 
-import string
-import random
 import pyperclip
-import argparse
-import csv
-import os
 import zxcvbn
-from datetime import datetime, timedelta
 
 HISTORY_FILE = 'password_history.txt'
 EXPIRATION_DAYS = 90
+
 
 def generate_password(length=12, include_letters=True, include_digits=True, include_symbols=True):
     characters = ''
@@ -25,23 +24,26 @@ def generate_password(length=12, include_letters=True, include_digits=True, incl
     password = ''.join(random.choice(characters) for _ in range(length))
     return password
 
+
 def evaluate_password_strength(password):
     result = zxcvbn.zxcvbn(password)
-    score = result['score']
-    feedback = result['feedback']['warning'] or result['feedback']['suggestions']
-    if not feedback:
-        feedback = 'Strong and secure password!'
+    # Suppress yellow underline: The 'score' key is present in the result dictionary
+    score = result['score']  # type: ignore
+    feedback = result['feedback']['suggestions'][0] if result['feedback'][
+        'suggestions'] else 'Strong and secure password!'
     return score, feedback
 
 
 def copy_to_clipboard(text):
     pyperclip.copy(text)
 
+
 def save_password_to_history(password):
     expiration_date = datetime.now() + timedelta(days=EXPIRATION_DAYS)
     with open(HISTORY_FILE, 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([password, expiration_date.strftime('%Y-%m-%d')])
+
 
 # Function to handle the Save button click event
 def save_password_handler():
@@ -60,12 +62,15 @@ def save_password_handler():
             writer.writerow([password, datetime.now().strftime('%Y-%m-%d')])
         messagebox.showinfo("Password Saved", f"Password saved to file:\n{filename}")
     else:
-        messagebox.showwarning("No File Selected", "No file selected. Password saved in default location (password_history.txt).")
+        messagebox.showwarning("No File Selected",
+                               "No file selected. Password saved in default location (password_history.txt).")
+
 
 # Function to fade the "Copied to clipboard" label
 def fade_copied_label():
     copied_label.config(text="")
     copied_label.after(3000, lambda: copied_label.config(fg="white"))
+
 
 # Create the main window
 window = tk.Tk()
@@ -83,6 +88,7 @@ y = (screen_height - window_height) // 2
 
 # Set the window geometry
 window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
 
 # Function to generate a password and display it
 def generate_password_handler():
@@ -110,8 +116,6 @@ def generate_password_handler():
     # Copy the password to clipboard
     copy_to_clipboard(password)
     copied_label.config(text="Copied to clipboard!", fg="green")
-
-
 
 
 # Label for password length
@@ -165,4 +169,3 @@ window.after(3000, fade_copied_label)
 
 # Run the Tkinter event loop
 window.mainloop()
-

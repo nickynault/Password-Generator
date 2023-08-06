@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 HISTORY_FILE = 'password_history.txt'
 EXPIRATION_DAYS = 90
 
+
 # Generates a random password with customizable options
 def generate_password(length=12, include_letters=True, include_digits=True, include_symbols=True):
     characters = ''
@@ -20,54 +21,59 @@ def generate_password(length=12, include_letters=True, include_digits=True, incl
     if include_symbols:
         characters += string.punctuation
 
-    password = ''.join(random.choice(characters) for _ in range(length))
-    return password
+    pword = ''.join(random.choice(characters) for _ in range(length))
+    return pword
+
 
 # Evaluates the strength of a password using zxcvbn library
-def evaluate_password_strength(password):
-    result = zxcvbn.zxcvbn(password)
+def evaluate_password_strength(pword):
+    result = zxcvbn.zxcvbn(pword)
     return result
+
 
 # Copies the given text to the clipboard
 def copy_to_clipboard(text):
     pyperclip.copy(text)
 
+
 # Saves the password and its expiration date to the password history file
-def save_password_to_history(password):
-    expiration_date = datetime.now() + timedelta(days=EXPIRATION_DAYS)
-    with open(HISTORY_FILE, 'a') as file:
-        file.write(f"{password},{expiration_date.strftime('%Y-%m-%d')}\n")
+def save_password_to_history(pword):
+    expirationDate = datetime.now() + timedelta(days=EXPIRATION_DAYS)
+    with open(HISTORY_FILE, 'a') as FILE:
+        FILE.write(f"{pword},{expirationDate.strftime('%Y-%m-%d')}\n")
+
 
 # Loads the password history from the file
 def load_password_history():
     if not os.path.isfile(HISTORY_FILE):
         return []
-    with open(HISTORY_FILE, 'r') as file:
-        password_history = file.read().splitlines()
-    return password_history
+    with open(HISTORY_FILE, 'r') as FILE:
+        passwordHistory = FILE.read().splitlines()
+    return passwordHistory
+
 
 # Checks for expired passwords in the password history
 def check_password_expiration():
-    password_history = load_password_history()
-    if not password_history:
+    passwordHistory = load_password_history()
+    if not passwordHistory:
         print('No password history found.')
         return
 
     today = datetime.now().date()
     expired_passwords = []
-    for password_entry in password_history:
+    for passwordEntry in passwordHistory:
         try:
-            password, expiration_date = password_entry.split(',')
-            expiration_date = datetime.strptime(expiration_date, '%Y-%m-%d').date()
-            if expiration_date <= today:
-                expired_passwords.append(password)
+            pword, expirationDate = passwordEntry.split(',')
+            expirationDate = datetime.strptime(expirationDate, '%Y-%m-%d').date()
+            if expirationDate <= today:
+                expired_passwords.append(pword)
         except ValueError:
             continue
 
     if expired_passwords:
         print('Expired passwords:')
-        for password in expired_passwords:
-            print(password)
+        for pword in expired_passwords:
+            print(pword)
     else:
         print('No expired passwords.')
 
@@ -119,7 +125,7 @@ if __name__ == '__main__':
 
         # Evaluate the strength of the first password generated
         password_strength = evaluate_password_strength(passwords[0][0])
-        score = password_strength['score']
+        score = password_strength['score']  # type: ignore
         feedback = password_strength['feedback']
 
         # Save passwords to a file if the filename is provided
