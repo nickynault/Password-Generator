@@ -34,6 +34,7 @@ To generate a password, run the following command:
   python password_generator.py
   
 The generated password will be printed, and it will be automatically copied to your clipboard.
+If you want to use the recently added GUI instead, just run that .py instead of the original, it'll open, and be pretty self-explanatory.
 
 
 ## Customization
