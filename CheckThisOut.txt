@@ -1,0 +1,2 @@
+This is a great example of something I created at the start of my Python journey with online resources, vs the Password Manager I made in my 100 Days of Python repo on days 29-30.
+This is fully working of course, but very barebones and the way it's done shows a lot what knowledge I had, shortcuts missed, methods used and so on. Thanks for checking it out!
